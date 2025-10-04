@@ -14,25 +14,39 @@ def home():
 @app.get("/scrape")
 def scrape_job_details():
     """
-    Uses Selenium to scrape job details from the dynamic page.
+    Uses Selenium to scrape job details from the dynamic page (inside iframe).
     """
     try:
+        from selenium.webdriver.chrome.service import Service
+        from selenium.webdriver.common.by import By
+        import time
+
         options = Options()
         options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
 
+        # Start Chrome driver
         driver = webdriver.Chrome(options=options)
         driver.get(JOB_URL)
 
-        driver.implicitly_wait(5)
+        # Give page some time to fully load iframe
+        time.sleep(3)
+
+        # Switch to iframe that contains job content
+        iframe = driver.find_element(By.CSS_SELECTOR, "iframe.iCIMS_iframe")
+        driver.switch_to.frame(iframe)
+
+        # Wait for content
+        time.sleep(2)
 
         soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        title = soup.find("h1", class_="iCIMS_Header")
-        job_id = soup.find("span", class_="iCIMS_JobNumber")
-        location = soup.find("span", class_="iCIMS_JobHeaderFieldValue")
-        description_div = soup.find("div", class_="iCIMS_JobContent")
+        # Extract job data
+        title = soup.select_one("h1.iCIMS_Header")
+        job_id = soup.select_one("span.iCIMS_JobNumber")
+        location = soup.select_one("div.iCIMS_JobHeaderFieldContainer span.iCIMS_JobHeaderFieldValue")
+        description_div = soup.select_one("div.iCIMS_JobContent")
 
         driver.quit()
 
