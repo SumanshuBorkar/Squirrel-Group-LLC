@@ -26,10 +26,10 @@ Extract the following details:
 
 ---
 
-## 🧩 Project Structure
+### 🧩 Project Structure
 
-web-scraper/
-│
-├── main.py # Main FastAPI application with the scraping logic
-├── requirements.txt
-└── README.md
+- web-scraper/
+- │
+- ├── main.py # Main FastAPI application with the scraping logic
+- ├── requirements.txt
+- └── README.md
