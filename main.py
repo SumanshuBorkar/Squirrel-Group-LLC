@@ -26,26 +26,20 @@ def scrape_job_details():
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
 
-        # Initialize Chrome
         driver = webdriver.Chrome(options=options)
         driver.get(JOB_URL)
 
-        # Wait for iframe to load
         time.sleep(3)
 
-        # Switch into iframe
         iframe = driver.find_element(By.ID, "icims_content_iframe")
         driver.switch_to.frame(iframe)
 
-        # Wait for job content
         time.sleep(2)
 
         soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        # Extract title
         title = soup.select_one("h1.iCIMS_Header")
 
-        # Extract header tags for Job ID & Location
         job_id, location = None, None
         header_tags = soup.select("div.iCIMS_JobHeaderTag")
 
@@ -63,7 +57,6 @@ def scrape_job_details():
             elif "location" in label_text or "job location" in label_text:
                 location = value_text
 
-        # Extract description
         description_div = soup.select_one("div.iCIMS_JobContent")
 
         driver.quit()
