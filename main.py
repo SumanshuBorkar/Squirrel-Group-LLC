@@ -14,7 +14,7 @@ def home():
 @app.get("/scrape")
 def scrape_job_details():
     """
-    Uses Selenium to scrape job details from the dynamic iCIMS iframe.git 
+    Uses Selenium to scrape job details from the dynamic iCIMS iframe.
     """
     try:
         from selenium.webdriver.chrome.service import Service
@@ -30,30 +30,48 @@ def scrape_job_details():
         driver = webdriver.Chrome(options=options)
         driver.get(JOB_URL)
 
-        # Allow time for iframe injection
+        # Wait for iframe to load
         time.sleep(3)
 
-        # ✅ Correct selector (iframe has ID, not class)
+        # Switch into iframe
         iframe = driver.find_element(By.ID, "icims_content_iframe")
         driver.switch_to.frame(iframe)
 
-        # Wait for job content to load
+        # Wait for job content
         time.sleep(2)
 
         soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        # Extract content safely
+        # Extract title
         title = soup.select_one("h1.iCIMS_Header")
-        job_id = soup.select_one("span.iCIMS_JobNumber")
-        location = soup.select_one("span.iCIMS_JobHeaderFieldValue")
+
+        # Extract header tags for Job ID & Location
+        job_id, location = None, None
+        header_tags = soup.select("div.iCIMS_JobHeaderTag")
+
+        for tag in header_tags:
+            label = tag.select_one("dt")
+            value = tag.select_one("dd span")
+            if not label or not value:
+                continue
+
+            label_text = label.get_text(strip=True).lower()
+            value_text = value.get_text(strip=True)
+
+            if "job id" in label_text:
+                job_id = value_text
+            elif "location" in label_text or "job location" in label_text:
+                location = value_text
+
+        # Extract description
         description_div = soup.select_one("div.iCIMS_JobContent")
 
         driver.quit()
 
         return {
             "job_title": title.get_text(strip=True) if title else None,
-            "job_id": job_id.get_text(strip=True) if job_id else None,
-            "location": location.get_text(strip=True) if location else None,
+            "job_id": job_id,
+            "location": location,
             "description": description_div.get_text(strip=True, separator="\n") if description_div else None
         }
 
