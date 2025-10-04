@@ -1,10 +1,10 @@
-# 🕸️ Web Scraping Assignment — AEI Engineering Job Page
+#  Web Scraping Assignment — AEI Engineering Job Page
 
 This project is a small **FastAPI** application that scrapes job details (title, job ID, location, and description) from the given AEI Engineering careers page using **Selenium** and **BeautifulSoup**.
 
 ---
 
-## 🚀 Project Overview
+## Project Overview
 
 **Task:**  
 Scrape the following job page —  
@@ -26,7 +26,7 @@ Extract the following details:
 
 ---
 
-### 🧩 Project Structure
+### Project Structure
 
 - web-scraper/
 - │
